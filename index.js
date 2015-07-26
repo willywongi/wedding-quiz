@@ -114,6 +114,7 @@ wss.on("connection", function(ws) {
 		Game.instances[gameId].ws = ws;
 	})
 	ws.on("close", function() {
-		console.log("Board (game: %s) connection close", gameId);
+		delete Game[gameId];
+		console.log("Board connection close, removed game %s", gameId);
 	})
 })
