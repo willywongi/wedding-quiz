@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<title>Wedding Quiz</title>
+	<link rel="stylesheet" href="flipper.css">
+	<script src="//code.jquery.com/jquery-2.1.4.min.js"></script>
+	<script>GAME_ID = <%= gameId %>;</script>
+	<script src="board.js"></script>  	
+	<style>
+	#main {
+		position: relative;
+		width: <%= width %>px;
+		height: <%= height %>px;
+	}
+		#main > div {
+			position: absolute;
+		}
+		#main div.back {
+			background: url('<%= url %>') 0 0 no-repeat;
+		}
+		#main div.front {
+			box-shadow: 0 0 3px black inset;
+		}
+  </style>
+</head>
+<body>
+	<h1>Board</h1>
+	<div id="main">
+	<% blocks.forEach(function(r) { %>
+		<div id="card<%= r.card %>" class="flip-container" style="top: <%= r.top %>; left: <%= r.left %>; width: <%= r.width %>; height: <%= r.height %>">
+			<div class="flipper">
+				<div class="front" style="width: <%= r.width %>; height: <%= r.height %>"></div>
+				<div class="back" style="width: <%= r.width %>; height: <%= r.height %>; background-position: <%= r.bgLeft %> <%= r.bgTop %>"></div>
+			</div>
+		</div>
+	<% }); %>
+	</div>
+	<a href="/index.html?<%= gameId %>" target="_new">Vedi domande...</a>
+</body>
+</html>
