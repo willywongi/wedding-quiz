@@ -1,8 +1,10 @@
 var shuffle = require('shuffle-array');
-var EventEmitter = require('events').EventEmitter;
+//var EventEmitter = require('events').EventEmitter;
+var EventTarget = require('biee').EventTarget;
 var WebSocketServer = require("ws").Server;
 var http = require("http");
 var express = require('express');
+var QUESTIONS = require('./questions');
 var app = express();
 var port = process.env.PORT || 5000
 app.set('port', port);
@@ -21,39 +23,66 @@ var Player = function(clientIp) {
 	// a Player is id'ed by its IP address.
 	this.id = clientIp;
 	this.score = 0;
+	this.questionSequence = Player.setupQuestions();
+	Player.instances[this.id] = this;
+}
+Player.instances = {};
+Player.get = function(id) {
+	return Player.instances[id] || (new Player(id));
+}
+Player.setupQuestions = function() {
+	return shuffle(Array.apply(null, {length: Game.MAX_SCORE}).map(Number.call, Number));
+}
+Player.prototype = Object.create(EventTarget.prototype);
+Player.prototype.setScore = function(amount) {
+	amount = amount || 1;
+	this.score += amount;
+}
+Player.prototype.getNextQuestion = function() {
+	return this.questionSequence.pop();
 }
 
 var Game = function() {
 	this.id = new Date().getTime();
 	this.score = Game.MAX_SCORE;
-	this.ws = null;
+	this.publish('answer', {
+		defaultFn: this._answer
+	})
 	this.players = {};
 	// Let's prepare the quesitons for this game
-	for (var questions = [], i = 0; i < this.score; i++) {
-		questions.push(i);
-	}
-	this.questions = shuffle(questions);
+	this.questions = shuffle(Game.getQuestions(this.id));
 	// expose this instance to the global name (Game)
 	Game.instances[this.id] = this;
 	console.log('New game started with %s questions', this.score);
 }
 Game.MAX_SCORE = 16;
 Game.instances = {};
-Game.prototype = Object.create(EventEmitter.prototype);  // FIXME: event emitter
-Game.prototype.answer = function(player) {
-	/* One player answered correctly to a question, update the game score. 
-	*/
+Game.getQuestions = function(id) {
+	for (var question, questions = [], i = 0; i < Game.MAX_SCORE; i++) {
+		question = QUESTIONS[(id + i) % QUESTIONS.length];
+		questions.push({
+			card: i,
+			q: question.q,
+			o: [question.o1, question.o2, question.o3, question.o4],
+			a: question.a
+		});
+	}
+	return questions;
+};
+
+Game.prototype = Object.create(EventTarget.prototype);
+Game.prototype._answer = function(e, opt) {
+	if (opt.player) {
+		opt.player.score += 1;
+	}
 	this.score -= 1;
-	var card = this.questions[this.score];
-	console.log('Question answered! Uncover card %s', card);
-	if (player) {
-		player.score += 1;
-	}
-	if (this.ws) {
-		// Tells the board to update itself.
-		// FIXME: event emitter
-		this.ws.send(JSON.stringify(card), function(){});
-	}
+};
+Game.prototype.answer = function(player) {
+	/* One player answered correctly to a question, update the game score.
+	*/
+	var question = this.questions[this.score - 1];
+	this.fire('answer', {'question': question, 'player': player});
+	console.log('Question %s answered!', question);
 }
 Game.prototype.addPlayer = function(player) {
 	if (! this.players.hasOwnProperty(player.id)) {
@@ -92,29 +121,42 @@ app.get('/board', function(req, res) {
 		height: image1.height,
 		url: '/photos/1.jpg',
 		blocks: blocks
-	});	
+	});
 })
+
+app.get('/:game', function(req, res) {
+	var player = Player.get(req.ip),
+		game = Game.instances[req.params.game],
+		questionIndex = player.getNextQuestion();
+	res.render('question', {
+		x: questionIndex,
+		question: game.questions[questionIndex]
+	});
+});
 
 app.get('/:game/answer', function(req, res) {
 	// a player answers a question. Now we just assume she answers correctly every time
-	var player = new Player(req.ip),
-		quiz = Game.instances[req.params.game];
-	quiz.addPlayer(player);
-	quiz.answer(player);
+	var player = Player.get(req.ip),
+		game = Game.instances[req.params.game];
+	game.addPlayer(player);
+	game.answer(player);
 	res.send(JSON.stringify(true));
 })
 
 wss.on("connection", function(ws) {
-	var gameId;
+	var game;
 	console.log("New board incoming...");
 	ws.on('message', function(message) {
-		gameId = message;
+		var gameId = message;
 		// Client sends in game-id
 		console.log("Connected to board %s", gameId);
-		Game.instances[gameId].ws = ws;
+		game = Game.instances[gameId];
+		game.on('answer', function(question) {
+			ws.send(JSON.stringify(question), function(){});
+		});
 	})
 	ws.on("close", function() {
-		delete Game[gameId];
-		console.log("Board connection close, removed game %s", gameId);
+		delete Game[game.id];
+		console.log("Board connection close, removed game %s", game.id);
 	})
 })
