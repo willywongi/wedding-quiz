@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<title>Wedding Quiz</title>
+	<link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.6.0/pure-min.css">
+	<link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.6.0/grids-responsive-min.css">
+	<script src="//code.jquery.com/jquery-2.1.4.min.js"></script>
+	<script src="/qrcode.min.js"></script>
+	<style>
+		.content {
+			max-width: 800px;
+			margin: 0 auto;
+			padding: 0 1em;
+		}
+		h2 {
+			text-align: center;
+			font-size: 3em;
+		}
+		.answers {
+			border: 2px solid #D2E8F7;
+			border-radius: 4px;
+		}
+		.answer {
+			text-align: center;
+			padding: 0.5em 1em;
+			margin: 0.25em;
+			background-color: #1F8DD6;
+			font-size: 4em;
+			color: #fff;
+			border-radius: 2px;
+		}
+		.wrong {
+			background-color: #D61F39;
+		}
+		.right {
+			background-color: #329E17;
+		}
+		/* low res phones */
+		@media screen and (min-width: 35.5em) {
+			h2 { font-size: 4em; }
+			.answer { font-size: 4em; }
+		}
+		/* LG */
+		@media screen and (min-width: 64em) {
+			h2 { font-size: 3em; }
+			.answer { font-size: 2em}
+		}
+	</style>
+</head>
+<body>
+	<div class="content">
+		<h2><%= questionText %></h2>
+		<div class="answers pure-g">
+			<div class="pure-u-1 pure-u-lg-1-2">
+				<p class="answer" data-answer="0"><%= questionOptions[0] %></p>
+			</div>
+			<div class="pure-u-1 pure-u-lg-1-2">
+				<p class="answer" data-answer="1"><%= questionOptions[1] %></p>
+			</div>
+			<div class="pure-u-1 pure-u-lg-1-2">
+				<p class="answer" data-answer="2"><%= questionOptions[2] %></p>
+			</div>
+			<div class="pure-u-1 pure-u-lg-1-2">
+				<p class="answer" data-answer="3"><%= questionOptions[3] %></p>
+			</div>
+		</div>
+	</div>
+		
+	<script>
+		var lock;
+		$('.answer').on('click', function(e) {
+			// Tell the server I answered a qestion
+			if (lock) {
+				return;
+			} else {
+				lock = true;
+			}
+			$.get("respond/<%= id %>/" + $(e.target).attr('data-answer'), function(rawResponse, status, xhr) {
+				var response = JSON.parse(rawResponse);
+				if (response) {
+					$(e.target).addClass('right');
+				} else {
+					$(e.target).addClass('wrong');
+				}
+				window.setTimeout(function() {
+						window.location.reload();
+					}, 1000);
+			});
+		})
+	</script>
+</body>
+</html>

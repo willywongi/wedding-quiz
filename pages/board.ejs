@@ -5,14 +5,16 @@
 	<title>Wedding Quiz</title>
 	<link rel="stylesheet" href="flipper.css">
 	<script src="//code.jquery.com/jquery-2.1.4.min.js"></script>
+	<script src="/qrcode.min.js"></script>
 	<script>GAME_ID = <%= gameId %>;</script>
 	<script src="board.js"></script>  	
 	<style>
-	#main {
-		position: relative;
-		width: <%= width %>px;
-		height: <%= height %>px;
-	}
+		#main {
+			position: relative;
+			width: <%= width %>px;
+			height: <%= height %>px;
+			margin: 0 auto;
+		}
 		#main > div {
 			position: absolute;
 		}
@@ -20,12 +22,16 @@
 			background: url('<%= url %>') 0 0 no-repeat;
 		}
 		#main div.front {
-			box-shadow: 0 0 3px black inset;
+			box-shadow: 0 0 3px #FFF inset;
+		}
+		#player-link {
+			position: absolute;
+			bottom: 10px;
+			right: 10px;
 		}
   </style>
 </head>
 <body>
-	<h1>Board</h1>
 	<div id="main">
 	<% blocks.forEach(function(r) { %>
 		<div id="card<%= r.card %>" class="flip-container" style="top: <%= r.top %>; left: <%= r.left %>; width: <%= r.width %>; height: <%= r.height %>">
@@ -36,6 +42,8 @@
 		</div>
 	<% }); %>
 	</div>
-	<a href="/index.html?<%= gameId %>" target="_new">Vedi domande...</a>
+	<a href="/<%= gameId %>/question" target="_new" id="player-link">
+		<div id="player-qrcode"></div>
+	</a>
 </body>
 </html>

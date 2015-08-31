@@ -6,7 +6,11 @@ ws.onopen = function() {
 }
 ws.onmessage = function(event) {
 	// The server is telling me which question has been correctly answered.
-	var questions = parseInt(event.data, 10);
+	var data = JSON.parse(event.data);
 	// let's flip the card.
-	$('#card' + questions).toggleClass('flipped');
+	console.log(event.data);
+	$('#card' + data).toggleClass('flipped');
 };
+$(function() {
+	new QRCode(document.getElementById("player-qrcode"), window.location.protocol + "//" + window.location.host + "/" + GAME_ID + "/question");
+})
