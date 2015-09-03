@@ -3,44 +3,60 @@
 <head>
 	<meta charset="utf-8" />
 	<title>Wedding Quiz</title>
-	<link rel="stylesheet" href="flipper.css">
 	<script src="//code.jquery.com/jquery-2.1.4.min.js"></script>
 	<script src="/qrcode.min.js"></script>
 	<script>GAME_ID = <%= gameId %>;</script>
 	<script src="board.js"></script>  	
 	<style>
-		#main {
-			position: relative;
-			width: <%= width %>px;
-			height: <%= height %>px;
-			margin: 0 auto;
+		#slideshow { 
+		    margin: 50px auto; 
+		    position: relative; 
+		    width: 820px; 
+		    height: 420px; 
+		    padding: 10px; 
+		    box-shadow: 0 0 20px rgba(0,0,0,0.4); 
 		}
-		#main > div {
-			position: absolute;
-		}
-		#main div.back {
-			background: url('<%= url %>') 0 0 no-repeat;
-		}
-		#main div.front {
-			box-shadow: 0 0 3px #FFF inset;
-		}
+		
+		#slideshow > div { 
+		    position: absolute; 
+		    top: 10px; 
+		    left: 10px; 
+		    right: 10px; 
+		    bottom: 10px; 
+		}		
 		#player-link {
 			position: absolute;
 			bottom: 10px;
 			right: 10px;
 		}
+		#progress {
+			width: 800px;
+		}
+		.progress-bar {
+			height: 2em;
+			background-color: slategray;
+			display: inline-block;
+			box-sizing: border-box;
+			width: 25%;
+			border: 2px solid #FFF;
+			transition: background-color 2s ease;
+		}
+		.progress-bar.okay {
+			background-color: lime;
+		}
   </style>
 </head>
 <body>
-	<div id="main">
-	<% blocks.forEach(function(r) { %>
-		<div id="card<%= r.card %>" class="flip-container" style="top: <%= r.top %>; left: <%= r.left %>; width: <%= r.width %>; height: <%= r.height %>">
-			<div class="flipper">
-				<div class="front" style="width: <%= r.width %>; height: <%= r.height %>"></div>
-				<div class="back" style="width: <%= r.width %>; height: <%= r.height %>; background-position: <%= r.bgLeft %> <%= r.bgTop %>"></div>
-			</div>
-		</div>
-	<% }); %>
+	<div id="slideshow">
+		<% photos.forEach(function(name) { %>
+	   	<div>
+	    	<img src="/photos/<%= name %>" width="800">
+	   	</div>
+	<% }); %>		   
+	</div>
+	
+	<div id="progress">
+		<div class="progress-bar">&nbsp;</div><div class="progress-bar">&nbsp;</div><div class="progress-bar">&nbsp;</div><div class="progress-bar">&nbsp;</div>
 	</div>
 	<a href="/<%= gameId %>/question" target="_new" id="player-link">
 		<div id="player-qrcode"></div>

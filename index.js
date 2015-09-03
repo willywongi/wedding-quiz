@@ -1,3 +1,5 @@
+
+var fs = require('fs');
 var shuffle = require('shuffle-array');
 var EventTarget = require('biee').EventTarget;
 var WebSocketServer = require("ws").Server;
@@ -107,34 +109,19 @@ Game.prototype.getQuestionForPlayer = function(player) {
 app.get('/board', function(req, res) {
 	// When someone connects to this url, there's a board. Give it a new game.
 	var game = new Game();
-	var blocks = [],
-		image1 = {
-			width: 460,
-			height: 385
-		},
-		side = Math.sqrt(Game.MAX_SCORE),
-		w = image1.width / side,
-		h = image1.height / side;
-	for (var i = 0, j = Math.pow(side, 2); i<j; i++) {
-		var x = i % side,
-			y = Math.floor(i / side);
-		blocks.push({
-			card: i,
-			top: (h * y) + "px",
-			left: (w * x) + "px",
-			width: (w) + "px",
-			height: (h) + "px",
-			bgLeft: (w * x * -1) + "px",
-			bgTop: (h * y * -1) + "px"
-		})
-	}
-
-	res.render('board', {
-		gameId: game.id,
-		width: image1.width,
-		height: image1.height,
-		url: '/photos/1.jpg',
-		blocks: blocks
+	fs.readdir('public/photos/', function(err, items) {
+		var photos = []
+	    for (var i=0; i<items.length; i++) {
+			if (items[i].match(/\d+\.jpg/)) {
+				photos.push(items[i]);
+			}
+	    }
+		photos.sort();
+		console.log(photos);
+		res.render('board', {
+			gameId: game.id,
+			photos: photos
+		});	
 	});	
 })
 
