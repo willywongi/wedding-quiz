@@ -30,25 +30,19 @@ Timer.prototype.start = function() {
 Timer.prototype.reset = function() {
 	this._start = window.performance.now();
 	this._stop = this._start + this._initialDuration;
+	console.log(this._start, this._initialDuration, this._stop);
 	return this._start;
 }
 
-Timer.prototype.changeDuration = function(msec) {
-	var newStop = (this._stop + msec > window.performance.now()) ? this._stop + msec : this._stop;
-	console.log('Changing stop time', this._stop, newStop);
+Timer.prototype.changeStop = function(newStop) {
 	this._stop = newStop;
+	console.log('Changing stop time', this._stop, newStop);
 }
 
-/*
-var previousValue = 0,
-	progressBar = document.getElementById('progress-bar');
-TIMER = new Timer(function(now, elapsed, total, timeStep) {
-		var nextValue = previousValue + timeStep / total;
-		progressBar.style.width = 100 * nextValue + "%";
-		previousValue = nextValue;
-	}, 30000);
-	
-	TIMER.start().then(function() {
-		console.log('Timer ended!');
-	});
-*/
+Timer.prototype.changeDuration = function(msec) {
+	this.changeStop(this._stop + msec);
+}
+
+Timer.prototype.changeSpeed = function(ratio) {
+	this.changeStop(this._stop / ratio);
+}

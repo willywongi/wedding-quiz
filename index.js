@@ -49,6 +49,9 @@ var Game = function() {
 	this.publish('response', {
 		defaultFn: this._onResponse.bind(this)
 	});
+	this.publish('boardStart', {
+		defaultFn: this._onBoardStart.bind(this)
+	})
 	// expose this instance to the global name (Game)
 	Game.instances[this.id] = this;
 	console.log('New game started with %s questions', this.score);
@@ -60,7 +63,7 @@ Game.prototype.getQuestion = function(index) {
 	return this.questions[index];
 }
 Game.prototype.answer = function(questionIndex, answer, player) {
-	/* If player answered correctly to the question, update the game score. 
+	/* If player answered correctly to the question, update the game score.
 	*/
 	var question = this.getQuestion(questionIndex),
 		result = (question.a === answer);
@@ -84,8 +87,14 @@ Game.prototype._onResponse = function(e, context) {
 		}
 	}
 }
+Game.prototype._onBoardStart = function(e) {
+	this._started = true;
+}
 Game.prototype.addPlayer = function(playerId) {
 	if (! this.players.hasOwnProperty(playerId)) {
+		if (this._started) {
+			this.fire('boardStart');
+		}
 		this.players[playerId] = new Player(playerId);
 	}
 	return this.players[playerId];
@@ -112,17 +121,16 @@ app.get('/board', function(req, res) {
 	fs.readdir('public/photos/', function(err, items) {
 		var photos = []
 	    for (var i=0; i<items.length; i++) {
-			if (items[i].match(/\d+\.jpg/)) {
+			if (items[i].match(/(jpg|jpeg|gif|png)$/)) {
 				photos.push(items[i]);
 			}
 	    }
-		photos.sort();
 		console.log(photos);
 		res.render('board', {
 			gameId: game.id,
-			photos: photos
-		});	
-	});	
+			photos: shuffle(photos)
+		});
+	});
 })
 
 app.get('/:game/question', function(req, res) {
@@ -140,9 +148,9 @@ app.get('/:game/question', function(req, res) {
 });
 
 app.get('/:game/respond/:question/:answer', function(req, res) {
-	// a player answers a question. 
+	// a player answers a question.
 	var quiz = Game.instances[req.params.game],
-		player = quiz.addPlayer(req.ip), 
+		player = quiz.addPlayer(req.ip),
 		questionIndex = parseInt(req.params.question, 10),
 		answer = parseInt(req.params.answer, 10),
 		result;
@@ -157,13 +165,22 @@ wss.on("connection", function(ws) {
 	ws.on('message', function(gameId) {
 		// Client sends in game-id
 		console.log("Connected to board %s", gameId);
-		var game = Game.instances[gameId]; 
+		var game = Game.instances[gameId];
 		game.on('response', function(e, context) {
 			if (context.result) {
 				// a question has been correctly answered
 				console.log('Answer responded correctly, uncovering tile %s', context.question.id);
-				ws.send(JSON.stringify(context.question.id));
+				ws.send(JSON.stringify({
+					type: 'correctAnswer',
+					payload: {id: context.question.id}
+				}));
 			}
+		});
+		game.on('boardStart', function(e) {
+			console.log('Board starting');
+			ws.send(JSON.stringify({
+				type: 'boardStart'
+			}));
 		})
 	})
 	ws.on("close", function() {

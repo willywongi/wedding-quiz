@@ -6,57 +6,92 @@
 	<script src="//code.jquery.com/jquery-2.1.4.min.js"></script>
 	<script src="/qrcode.min.js"></script>
 	<script>GAME_ID = <%= gameId %>;</script>
-	<script src="board.js"></script>  	
+	<script src="timer.js"></script>
+	<script src="board.js"></script>
 	<style>
-		#slideshow { 
-		    margin: 50px auto; 
-		    position: relative; 
-		    width: 820px; 
-		    height: 420px; 
-		    padding: 10px; 
-		    box-shadow: 0 0 20px rgba(0,0,0,0.4); 
+		html, body {
+			width: 100%;
+			height: 100%;
+			position: absolute;
+			margin: 0;
+			padding: 0;
 		}
-		
-		#slideshow > div { 
-		    position: absolute; 
-		    top: 10px; 
-		    left: 10px; 
-		    right: 10px; 
-		    bottom: 10px; 
-		}		
 		#player-link {
 			position: absolute;
 			bottom: 10px;
 			right: 10px;
+			background-color: #fff;
+			padding: 10px;
 		}
-		#progress {
-			width: 800px;
+		#slideshow {
+		    position: absolute;
+		    top: 0;
+		    bottom: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			background-color: #000;
 		}
-		.progress-bar {
-			height: 2em;
-			background-color: slategray;
-			display: inline-block;
-			box-sizing: border-box;
-			width: 25%;
-			border: 2px solid #FFF;
-			transition: background-color 2s ease;
+		
+		#slideshow > div {
+		    position: absolute;
+			opacity: 0;
+			width: 100%;
+			height: 100%;
+			transition: opacity 1s ease;
 		}
-		.progress-bar.okay {
+		#slideshow > div:first-child {
+			opacity: 1;
+		}
+		
+		#slideshow img {
+			display: block;
+			margin: auto;
+			height: 100%;
+		}
+		#slideshow img.wide {
+		    width: 100%;
+		    max-height: 100%;
+		    height: auto;
+		}
+		#slideshow img.tall {
+		    height: 100%;
+		    max-width: 100%;
+		    width: auto;
+		}​
+		.progress {
+			width: 100%;
+			position: absolute;
+		}
+		.progress-step.okay {
 			background-color: lime;
+		}
+		#progress-bar {
+			position: absolute;
+			top: 0;
+			left: 0;
+			background-color: #3E3;
+			width: 0;
+			height: 10px;
 		}
   </style>
 </head>
 <body>
 	<div id="slideshow">
+		<div class="frontpage">
+			<h1>Wedding Quiz!</h1>
+			<h4>Accedi alle domande inquadrando con il telefonino il QR Code qui sotto: ogni risposta corretta
+			vi farà guadagnare nuove foto da mostrare! Non sapete le risposte? Provate a chiedere agli interessati!</h4>
+		</div>
 		<% photos.forEach(function(name) { %>
 	   	<div>
 	    	<img src="/photos/<%= name %>" width="800">
 	   	</div>
-	<% }); %>		   
+	<% }); %>
 	</div>
 	
-	<div id="progress">
-		<div class="progress-bar">&nbsp;</div><div class="progress-bar">&nbsp;</div><div class="progress-bar">&nbsp;</div><div class="progress-bar">&nbsp;</div>
+	<div class="progress">
+		<div id="progress-bar">&nbsp;</div>
 	</div>
 	<a href="/<%= gameId %>/question" target="_new" id="player-link">
 		<div id="player-qrcode"></div>
