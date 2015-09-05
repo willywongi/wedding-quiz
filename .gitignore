@@ -1,4 +1,4 @@
 node_modules
 public/photos
-DS_Store
+.DS_Store
 npm-debug.log
