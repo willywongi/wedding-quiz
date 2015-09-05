@@ -3,6 +3,7 @@
 <head>
 	<meta charset="utf-8" />
 	<title>Wedding Quiz</title>
+	<link href='https://fonts.googleapis.com/css?family=Indie+Flower|Lobster' rel='stylesheet' type='text/css'>
 	<script src="//code.jquery.com/jquery-2.1.4.min.js"></script>
 	<script src="/qrcode.min.js"></script>
 	<script>GAME_ID = <%= gameId %>;</script>
@@ -47,7 +48,6 @@
 		#slideshow img {
 			display: block;
 			margin: auto;
-			height: 100%;
 		}
 		#slideshow img.wide {
 		    width: 100%;
@@ -74,18 +74,36 @@
 			width: 0;
 			height: 10px;
 		}
+		.frontpage {
+			background-color: #FFF;
+			border: 2em solid transparent;
+			font-family: 'Indie Flower', cursive;
+			text-align: center;
+			font-size: 48px;
+			width: 100%;
+			box-sizing: border-box;
+		} 
+		.frontpage h1 {
+			font-size: 3em;
+			padding: 0;
+			margin:0.5em;
+		}
+		.frontpage p {
+			text-align: center;
+			padding: 1em 2em;
+		}
   </style>
 </head>
 <body>
 	<div id="slideshow">
 		<div class="frontpage">
 			<h1>Wedding Quiz!</h1>
-			<h4>Accedi alle domande inquadrando con il telefonino il QR Code qui sotto: ogni risposta corretta
-			vi farà guadagnare nuove foto da mostrare! Non sapete le risposte? Provate a chiedere agli interessati!</h4>
+			<p>Accedi alle domande inquadrando con il telefonino il QR Code qui sotto: ogni risposta corretta
+			vi farà guadagnare nuove foto da mostrare! Non sapete le risposte? Provate a chiedere agli interessati!</p>
 		</div>
-		<% photos.forEach(function(name) { %>
+	<% photos.forEach(function(name) { %>
 	   	<div>
-	    	<img src="/photos/<%= name %>" width="800">
+	    	<img src="/photos/<%= name %>">
 	   	</div>
 	<% }); %>
 	</div>

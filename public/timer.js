@@ -30,7 +30,6 @@ Timer.prototype.start = function() {
 Timer.prototype.reset = function() {
 	this._start = window.performance.now();
 	this._stop = this._start + this._initialDuration;
-	console.log(this._start, this._initialDuration, this._stop);
 	return this._start;
 }
 

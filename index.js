@@ -91,10 +91,10 @@ Game.prototype._onBoardStart = function(e) {
 	this._started = true;
 }
 Game.prototype.addPlayer = function(playerId) {
+	if (! this._started) {
+		this.fire('boardStart');
+	}
 	if (! this.players.hasOwnProperty(playerId)) {
-		if (this._started) {
-			this.fire('boardStart');
-		}
 		this.players[playerId] = new Player(playerId);
 	}
 	return this.players[playerId];
