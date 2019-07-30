@@ -11,7 +11,7 @@
   "license": "ISC",
   "dependencies": {
     "biee": "^1.0.1",
-    "ejs": "^2.3.3",
+    "ejs": "^2.6.2",
     "express": "^4.13.1",
     "shuffle-array": "^0.1.0",
     "ws": "^7.1.1"
