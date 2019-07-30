@@ -14,7 +14,7 @@
     "ejs": "^2.3.3",
     "express": "^4.13.1",
     "shuffle-array": "^0.1.0",
-    "ws": "^0.7.2"
+    "ws": "^7.1.1"
   },
   "devDependencies": {
     "es6-promise": "^3.0.2"
